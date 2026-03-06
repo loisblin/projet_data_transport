@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+
+# Environnement virtuel
+venv/
+env/
+.venv/
+
+# IDE / VSCode
+.vscode/
+.idea/
+
+# Dash / Plotly / logs
+*.log
+*.tmp
+.DS_Store
+
+# Fichiers de données générés
+*.csv
+*.db
+
+# Jupyter
+.ipynb_checkpoints/
