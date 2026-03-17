@@ -1,5 +1,6 @@
 
 from operator import or_, and_
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from database import SessionLocal
 from models import City
@@ -13,7 +14,10 @@ class TripRepository:
             session = SessionLocal()
         self.session = session  
     def get_city_by_name(self, name):
-        return self.session.query(City).filter_by(name=name).one()
+        try:
+            return self.session.query(City).filter_by(name=name).one()
+        except (NoResultFound, MultipleResultsFound):
+            return None
     def get_trips(self):
         trips = self.session.query(Trip).all()
         return trips 

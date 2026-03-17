@@ -1,68 +1,121 @@
+
 import dash
 from dash import dcc, html
-import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
+from dashboard.figure.table import *
 from repositories.city_repository import CityRepository
 from repositories.trip_repository import TripRepository
-import plotly.graph_objects as go
-app = dash.Dash(__name__)
+from dashboard.figure.map import *
+from dashboard.service.services import *
+from dashboard.app_instance import app
 
+
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>Dashboard</title>
+        {%favicon%}
+        {%css%}
+        <style>
+            html, body {
+                background-color: #0b0b0b;
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
 city_repo = CityRepository()
 trip_repo = TripRepository()
 
 cities = city_repo.get_all_cities()
-trips= trip_repo.get_trips()
-data = []
-fig = go.Figure()
-for city in cities:
-    data.append({
-        "city": city.name,
-        "lat": city.latitude,
-        "lon": city.longitude
-    })
+trips = trip_repo.get_trips()
 
-df = pd.DataFrame(data)
-# tracer les villes
-for trip in trips:
-    fig.add_trace(go.Scattergeo(
-        lon=[trip.departure_city.longitude, trip.arrival_city.longitude],
-        lat=[trip.departure_city.latitude, trip.arrival_city.latitude],
-        mode='lines',
-        line=dict(width=2, color='blue'),
-        opacity=0.6,
-    ))
 
-# tracer les villes comme points
-cities_set = {trip.departure_city for trip in trips}.union(
-    {trip.arrival_city for trip in trips}
+df_city= make_df_city_count_departure(city_repo)
+
+app.layout = html.Div(
+    style={
+        "display": "grid",
+        "gridTemplateColumns": "1.2fr 1.8fr",
+        "gridTemplateRows": "2fr 1fr",
+        "gap": "10px",
+        "height": "100vh",
+        "backgroundColor": "#0b0b0b",
+        "margin": 0,
+        "padding": "15px",
+        "boxSizing": "border-box"  # ← IMPORTANT
+    },
+    children=[
+
+        # Carré 1
+        html.Div(
+            dcc.Graph(
+                id="graph-1",
+                figure=create_france_map(cities, trips),
+                style={"height": "100%", "width": "100%"},
+                config={"displayModeBar": False},
+            ),
+            style={
+                "backgroundColor": "#111111",
+                "border": "3px solid #000000",  # bord noir autour
+                "borderRadius": "5px"           # coins arrondis optionnels
+            }
+        ),
+
+        # Carré 2
+        html.Div(
+            create_city_table(df_city,"table_id1"),
+            style={
+                "backgroundColor": "#111111",
+                "border": "3px solid #000000",
+                "borderRadius": "5px"
+            }
+        ),
+
+        # Carré 3
+        html.Div(
+            create_city_table(df_city,"table_id2"),
+            style={
+                "backgroundColor": "#111111",
+                "border": "3px solid #000000",
+                "borderRadius": "5px"
+            }
+        ),
+
+        # Carré 4
+       html.Div(
+    id="selected-city-display",
+    children="Aucune ville sélectionnée",
+    style={
+        "backgroundColor": "#111111",
+        "border": "3px solid #000000",
+        "borderRadius": "5px",
+        "color": "white",
+        "fontSize": "30px",
+        "display": "flex",
+        "justifyContent": "center",
+        "alignItems": "center",
+        "fontWeight": "bold"
+    }
+),
+    ]
 )
-
-for city in cities_set:
-    fig.add_trace(go.Scattergeo(
-        lon=[city.longitude],
-        lat=[city.latitude],
-        mode='markers+text',
-        marker=dict(size=8, color='red'),
-        text=[city.name],
-        textposition="top center"
-    ))
-
-# zoom sur la France
-fig.update_geos(
-    center={"lat":46.5, "lon":2.5},
-    lataxis_range=[41, 51],
-    lonaxis_range=[-5, 10],
-    showcountries=True,
-    showland=True,
-    landcolor="rgb(240,240,240)"
-)
-
-fig.update_layout(height=600, margin={"r":0,"t":0,"l":0,"b":0})
-app.layout = html.Div([
-    html.H1("Carte des villes"),
-    dcc.Graph(figure=fig)
-])
-
-
+# --- Import des callbacks après layout ---
+from dashboard.callbacks import callbacks   
 if __name__ == "__main__":
     app.run(debug=True)

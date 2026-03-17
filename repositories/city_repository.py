@@ -16,13 +16,14 @@ class CityRepository:
         self.session = session 
     
     def get_city_by_name(self, name):
-        return self.session.query(City).filter_by(name=name).one()
+        return self.session.query(City).filter(City.name ==name).first()
+
 
     def get_all_cities(self):
        
         return  self.session.query(City).all()
     
-    def get_cities_order_departure_count(self):
+    def get_cities_order_departure(self):
         
         return (
         self.session.query(City)
@@ -43,3 +44,11 @@ class CityRepository:
     )
     def get_cities_order_trips(self):
         return self 
+    
+    def get_count_departure_trip_by_city(self, city_name):
+        city_id= self.get_city_by_name(city_name).id
+        return (
+        self.session.query(func.count(Trip.id))
+        .filter(Trip.departure_city_id == city_id)
+        .scalar()
+    )   
