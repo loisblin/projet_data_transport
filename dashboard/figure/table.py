@@ -7,7 +7,7 @@ def create_city_table(df,id):
         columns=[{"name": i, "id": i} for i in df.columns],
         data=df.to_dict('records'),
         row_selectable="single",
-
+        selected_rows=[],  
         page_size=10,
         sort_action="native",
         filter_action="native",

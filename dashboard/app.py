@@ -39,14 +39,12 @@ app.index_string = '''
     </body>
 </html>
 '''
-city_repo = CityRepository()
-trip_repo = TripRepository()
-
-cities = city_repo.get_all_cities()
-trips = trip_repo.get_trips()
 
 
-df_city= make_df_city_count_departure(city_repo)
+cities = get_all_cities()
+trips = get_all_trips()
+
+df_city= make_df_city_count_departure()
 
 app.layout = html.Div(
     style={
@@ -116,6 +114,6 @@ app.layout = html.Div(
     ]
 )
 # --- Import des callbacks après layout ---
-from dashboard.callbacks import callbacks   
+from dashboard.callbacks import callbacks  
 if __name__ == "__main__":
     app.run(debug=True)
