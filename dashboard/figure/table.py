@@ -6,7 +6,6 @@ def create_city_table(df,id):
         id=id,
         columns=[{"name": i, "id": i} for i in df.columns],
         data=df.to_dict('records'),
-        row_selectable="single",
         selected_rows=[],  
         page_size=10,
         sort_action="native",
@@ -46,7 +45,7 @@ def create_city_table(df,id):
             # hover
             {
                 'if': {'state': 'active'},
-                'backgroundColor': '#eaf2f8',
+                'backgroundColor': '#3498db',
                 'border': '1px solid #3498db'
             }
         ],

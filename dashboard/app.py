@@ -47,6 +47,7 @@ trips = get_all_trips()
 df_city= make_df_city_count_departure()
 
 app.layout = html.Div(
+    
     style={
         "display": "grid",
         "gridTemplateColumns": "1.2fr 1.8fr",
@@ -59,7 +60,11 @@ app.layout = html.Div(
         "boxSizing": "border-box"  # ← IMPORTANT
     },
     children=[
-
+        # STORE GLOBAL
+        dcc.Store(
+    id="data-store",
+    data=df_city.to_dict("records")
+    ),
         # Carré 1
         html.Div(
             dcc.Graph(
