@@ -1,6 +1,7 @@
 
 from operator import or_, and_
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy import func,extract
 
 from database import SessionLocal
 from models import City
@@ -71,4 +72,60 @@ class TripRepository:
         )
         ).all()
 
-        
+    def count_trip_by_hour_for_day(self, day=None, city=None, hour=None):
+
+        query = self.session.query(
+            extract('hour', Trip.departure_time).label("hour"),
+            func.count().label("count")
+        )
+
+        if city:
+            query = query.filter(Trip.departure_city.has(name=city))
+
+        if day is not None:
+            query = query.filter(func.date(Trip.departure_time) == day)
+
+        if hour is not None:
+            query = query.filter(extract('hour', Trip.departure_time) == hour)
+
+        return query.group_by("hour").order_by("hour").all()
+    def count_trip_by_day(self,city=None):
+        query = self.session.query(
+                func.date(Trip.departure_time).label("day"),
+                func.count().label("count")
+            )
+        if city:
+            query = query.filter(Trip.departure_city.has(name=city))
+        return (
+            query
+            .group_by("day")
+            .order_by("day")
+            .all()
+        )
+    def get_count_departures_by_city(self, day=None, hour=None):
+        query = (
+        self.session.query(
+            City.name,
+            func.count(Trip.id)
+        )
+        .join(City, City.id == Trip.departure_city_id)
+        )
+
+        # ------------------
+        # FILTER DAY
+        # ------------------
+        if day is not None:
+            query = query.filter(func.date(Trip.departure_time) == day)
+
+        # ------------------
+        # FILTER HOUR
+        # ------------------
+        if hour is not None:
+            query = query.filter(extract('hour', Trip.departure_time) == hour)
+
+        # ------------------
+        # GROUP BY
+        # ------------------
+        query = query.group_by(City.name)
+
+        return query.all()

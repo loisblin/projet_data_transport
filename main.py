@@ -1,7 +1,6 @@
 from repositories.city_repository import CityRepository
 from repositories.trip_repository import TripRepository
 from database import SessionLocal
-from service.services import make_df_city_count_departure
 
 session= SessionLocal()
 city =CityRepository(session)
@@ -13,5 +12,7 @@ trip = TripRepository(session)
 # print(city.get_cities_order_arrival_count())
 # print(trip.get_city_by_name("lille"))
 
-df = make_df_city_count_departure(city)
-print(df)
+p=trip.count_trip_by_day()
+day = p[0][0]
+d=trip.count_trip_by_hour_for_day(day)
+print(d)

@@ -3,6 +3,7 @@ import dash
 from dash import dcc, html
 import plotly.graph_objects as go
 import pandas as pd
+from dashboard.figure.histograme import *
 from dashboard.figure.table import *
 from repositories.city_repository import CityRepository
 from repositories.trip_repository import TripRepository
@@ -44,7 +45,8 @@ app.index_string = '''
 cities = get_all_cities()
 trips = get_all_trips()
 
-df_city= make_df_city_count_departure()
+df_city= make_df_city_trip_depart()
+df_trip_time = make_df_trip_date()
 
 app.layout = html.Div(
     
@@ -65,6 +67,12 @@ app.layout = html.Div(
     id="data-store",
     data=df_city.to_dict("records")
     ),
+    dcc.Store(id="drill-state", data={
+        "level": "day",
+        "city": None,
+        "day": None,
+        "hour": None
+    }),
         # Carré 1
         html.Div(
             dcc.Graph(
@@ -80,26 +88,31 @@ app.layout = html.Div(
             }
         ),
 
+        
+
         # Carré 2
         html.Div(
-            create_city_table(df_city,"table_id1"),
+            dcc.Graph(
+        id="histo_day",
+        figure=create_histogram(df_trip_time, "day", "count"),
+        config={"displayModeBar": False}
+    ),
             style={
                 "backgroundColor": "#111111",
                 "border": "3px solid #000000",
                 "borderRadius": "5px"
             }
         ),
-
         # Carré 3
         html.Div(
-            create_city_table(df_city,"table_id2"),
-            style={
-                "backgroundColor": "#111111",
-                "border": "3px solid #000000",
-                "borderRadius": "5px"
-            }
+        id="table-container",  # 🔥 ICI
+        children=create_table_city(df_city),
+        style={
+        "backgroundColor": "#111111",
+        "border": "3px solid #000000",
+        "borderRadius": "5px"
+        }
         ),
-
         # Carré 4
        html.Div(
     id="selected-city-display",
@@ -122,3 +135,4 @@ app.layout = html.Div(
 from dashboard.callbacks import callbacks  
 if __name__ == "__main__":
     app.run(debug=True)
+    
