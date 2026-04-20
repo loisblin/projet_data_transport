@@ -184,6 +184,23 @@ def update_table(state, data):
         rows.append(row)
 
     return html.Div([header] + rows)
+@app.callback(
+    Output("map","srcDoc"),
+    Input("drill-state", "data"),
+    State("data-store", "data")
+)
+def update_map(state,data):
+    city = state.get("city")
+    day = state.get("day")
+    hour = state.get("hour")
+    level = state.get("level")
+    selected_city = None
+    if city is not None:
+        selected_city= True
+
+    trips= make_df_map_filtre(city,day,hour)
+    cities= get_all_cities()
+    return create_france_map(cities,trips,selected_city) 
 # @app.callback(
 #     Output("table_id1", "style_data_conditional"),
 #     Input("table_id1", "selected_rows"),

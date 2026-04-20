@@ -75,17 +75,13 @@ app.layout = html.Div(
     }),
         # Carré 1
         html.Div(
-            dcc.Graph(
-                id="graph-1",
-                figure=create_france_map(cities, trips),
-                style={"height": "100%", "width": "100%"},
-                config={"displayModeBar": False},
-            ),
-            style={
-                "backgroundColor": "#111111",
-                "border": "3px solid #000000",  # bord noir autour
-                "borderRadius": "5px"           # coins arrondis optionnels
-            }
+            html.Iframe(
+        id="map",
+        srcDoc=create_france_map(cities, trips),
+        style={"width": "100%", "height": "100%", "border": "none","backgroundColor": "#111111",
+                "border": "3px solid #000000",
+                "borderRadius": "5px"}
+        )
         ),
 
         

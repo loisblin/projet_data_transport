@@ -19,9 +19,17 @@ class TripRepository:
             return self.session.query(City).filter_by(name=name).one()
         except (NoResultFound, MultipleResultsFound):
             return None
-    def get_trips(self):
-        trips = self.session.query(Trip).all()
-        return trips 
+    def get_trips(self,city=None,day=None,hour=None):
+        query = self.session.query(Trip)
+        if city:
+            query = query.filter(Trip.departure_city.has(name=city))
+
+        if day is not None:
+            query = query.filter(func.date(Trip.departure_time) == day)
+
+        if hour is not None:
+            query = query.filter(extract('hour', Trip.departure_time) == hour)
+        return query.all()
     def get_all_trip_city(self,city_name):
 
         city = self.get_city_by_name(city_name)

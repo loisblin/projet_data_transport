@@ -45,3 +45,5 @@ def make_df_city_trip_depart(day=None,hour=None):
         return pd.DataFrame(columns=["cities", "count"])
 
     return pd.DataFrame(data, columns=["cities", "count"])
+def make_df_map_filtre(city=None,day=None,hour=None):
+    return  trip_repo.get_trips(city,day,hour)
