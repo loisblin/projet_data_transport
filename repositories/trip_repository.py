@@ -3,9 +3,9 @@ from operator import or_, and_
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy import func,extract
 
-from database import SessionLocal
-from models import City
-from models import Trip
+from backend.database import SessionLocal
+from backend.models import City
+from backend.models import Trip
 
 
 class TripRepository:

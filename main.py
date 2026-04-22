@@ -1,6 +1,6 @@
 from repositories.city_repository import CityRepository
 from repositories.trip_repository import TripRepository
-from database import SessionLocal
+from backend.database import SessionLocal
 
 session= SessionLocal()
 city =CityRepository(session)

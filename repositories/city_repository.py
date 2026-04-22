@@ -3,9 +3,9 @@
 
 from operator import or_
 from sqlalchemy import func
-from database import SessionLocal
-from models import City
-from models import Trip
+from backend.database import SessionLocal
+from backend.models import City
+from backend.models import Trip
 
 
 class CityRepository:

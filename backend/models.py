@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from database import Base
+from backend.database import Base
 
 class City(Base):
     __tablename__ = "cities"
@@ -25,7 +25,9 @@ class Trip(Base):
     departure_time = Column(DateTime, nullable=False)
     arrival_time = Column(DateTime, nullable=False)
 
-    duration_minutes = Column(Integer, nullable=False)
+    delay = Column(Integer, nullable=True) 
+
+    price = Column(Float, nullable=True) 
 
     departure_city = relationship("City", foreign_keys=[departure_city_id], back_populates="departures")
     arrival_city = relationship("City", foreign_keys=[arrival_city_id], back_populates="arrivals")
