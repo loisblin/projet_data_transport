@@ -30,6 +30,7 @@ class TripRepository:
         if hour is not None:
             query = query.filter(extract('hour', Trip.departure_time) == hour)
         return query.all()
+    
     def get_all_trip_city(self,city_name):
 
         city = self.get_city_by_name(city_name)

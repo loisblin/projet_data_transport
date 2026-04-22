@@ -3,12 +3,12 @@ import numpy as np
 
 import folium
 import numpy as np
-
+from folium.plugins import AntPath
 def create_france_map(cities_set, trips,selected_city=None):
-
-    import folium
-    import numpy as np
-    from folium.plugins import AntPath
+    print(" \n\ncreame1")
+    print(trips)
+    print("creame2")
+    
 
     # 🌍 Carte
     m = folium.Map(

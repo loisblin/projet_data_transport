@@ -96,7 +96,7 @@ def update_histo(state, data):
     if level == "day":
 
         df = make_df_trip_date(city=city)
-        return create_histogram(df, "day", "count")
+        return create_histogram(df, "day", "number of departures")
 
     # =========================
     # MODE HOUR
@@ -105,7 +105,7 @@ def update_histo(state, data):
 
         df = make_df_trip_date_by_hour(day, city=city)
 
-        return create_histogram(df, "hour", "count", hour)
+        return create_histogram(df, "hour", "number of departures", hour)
 @app.callback(
     Output("table-container", "children"),
     Input("drill-state", "data"),
@@ -153,7 +153,7 @@ def update_table(state, data):
     rows = []
 
     for i in range(len(df)):
-        print(df.columns)
+
         row_city = df.iloc[i]["cities"]
 
         # 🔥 STYLE DYNAMIQUE

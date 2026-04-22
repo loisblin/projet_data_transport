@@ -90,7 +90,7 @@ app.layout = html.Div(
         html.Div(
             dcc.Graph(
         id="histo_day",
-        figure=create_histogram(df_trip_time, "day", "count"),
+        figure=create_histogram(df_trip_time, "day", "number of departures"),
         config={"displayModeBar": False}
     ),
             style={
@@ -110,25 +110,20 @@ app.layout = html.Div(
         }
         ),
         # Carré 4
-       html.Div(
-    id="selected-city-display",
-    children="Aucune ville sélectionnée",
-    style={
+        html.Div(
+        id="trip-container",  # 🔥 ICI
+        children=create_trip_table(make_df_trip_filtre()),
+        style={
         "backgroundColor": "#111111",
         "border": "3px solid #000000",
-        "borderRadius": "5px",
-        "color": "white",
-        "fontSize": "30px",
-        "display": "flex",
-        "justifyContent": "center",
-        "alignItems": "center",
-        "fontWeight": "bold"
-    }
-),
+        "borderRadius": "5px"
+        }
+        ),
     ]
 )
 # --- Import des callbacks après layout ---
 from dashboard.callbacks import callbacks  
 if __name__ == "__main__":
+    print(cities)
     app.run(debug=True)
     
