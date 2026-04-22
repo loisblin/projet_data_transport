@@ -64,8 +64,3 @@ def make_df_trip_filtre(city=None,day=None,hour=None):
     
     return data
 
-if __name__ == "__main__":
-    data = make_df_map_filtre(None, None, None)
-    print( "feur")
-
-    print(data)
