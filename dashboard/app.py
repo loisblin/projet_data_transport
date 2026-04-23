@@ -5,8 +5,8 @@ import plotly.graph_objects as go
 import pandas as pd
 from dashboard.figure.histograme import *
 from dashboard.figure.table import *
-from repositories.city_repository import CityRepository
-from repositories.trip_repository import TripRepository
+from backend.repositories.city_repository import CityRepository
+from backend.repositories.trip_repository import TripRepository
 from dashboard.figure.map import *
 from dashboard.service.services import *
 from dashboard.app_instance import app

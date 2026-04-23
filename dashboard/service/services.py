@@ -3,8 +3,8 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 import pandas as pd
-from repositories.city_repository import CityRepository
-from repositories.trip_repository import TripRepository
+from backend.repositories.city_repository import CityRepository
+from backend.repositories.trip_repository import TripRepository
 from dashboard.app_instance import trip_repo, city_repo
 
 def get_all_cities():
