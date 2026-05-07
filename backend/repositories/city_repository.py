@@ -15,6 +15,16 @@ class CityRepository:
             session = SessionLocal()
         self.session = session 
     
+    
+    
+    def get_city_coords_dict(self):
+        return {
+            c.name: (c.latitude, c.longitude)
+            for c in self.session.query(City).all()
+        }
+    
+
+
     def get_city_by_name(self, name):
         return self.session.query(City).filter(City.name ==name).first()
 
@@ -22,7 +32,6 @@ class CityRepository:
     def get_all_cities(self):
        
         return  self.session.query(City).all()
-    
     def get_cities_order_departure(self):
         
         return (

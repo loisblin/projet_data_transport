@@ -26,7 +26,7 @@ def create_table_city(df):
     rows = []
     for i in range(len(df)):
         row = html.Div(
-            id={"type": "row", "city": str(df.iloc[i]["cities"])},  # 🔥 important pour les callbacks
+            id={"type": "row", "city": str(df.iloc[i]["Departure_city"])},  # 🔥 important pour les callbacks
             children=[
                 html.Div(str(df.iloc[i][col]), style={"flex": 1, "color": "white"})
                 for col in df.columns

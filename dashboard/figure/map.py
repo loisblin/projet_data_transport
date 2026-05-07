@@ -4,9 +4,8 @@ import numpy as np
 import folium
 import numpy as np
 from folium.plugins import AntPath
-def create_france_map(cities_set, trips,selected_city=None):
-
-
+def create_france_map( trips,cities_dict):
+    
     # 🌍 Carte
     m = folium.Map(
         location=[46.6, 2.4],
@@ -26,81 +25,53 @@ def create_france_map(cities_set, trips,selected_city=None):
     # ------------------
     # 🌆 VILLES
     # ------------------
-    for city in cities_set:
-
-        # 👉 prêt pour évolution (ex: city.volume)
-        radius = 4
-
+    
+    for city, values  in cities_dict.items():
+        
+        lat = values[0]
+        lon = values[1]
+        radius = 5
+        
         folium.CircleMarker(
-            location=[city.latitude, city.longitude],
+            location=[lat, lon],
             radius=radius,
             color="#4cc9f0",
             fill=True,
             fill_opacity=0.9,
-            tooltip=city.name
+            tooltip=city
         ).add_to(m)
 
     # ------------------
     # ✈️ TRAJETS
     # ------------------
-    for trip in trips:
+    for row in trips.itertuples():
 
-        lon_start = trip.departure_city.longitude
-        lon_end = trip.arrival_city.longitude
+        depart = row.departure_city
+        arrive = row.arrival_city
 
-        lat_start = trip.departure_city.latitude
-        lat_end = trip.arrival_city.latitude
+        # coords
+        lat1, lon1 = cities_dict[depart]
+        lat2, lon2 = cities_dict[arrive]
 
-        # courbe
-        lons = np.linspace(lon_start, lon_end, 50)
-        lats = (
-            np.linspace(lat_start, lat_end, 50)
-            + np.sin(np.linspace(0, np.pi, 50)) * 0.5
-        )
+        # épaisseur selon nb trips
+        weight = max(1, row.Number_of_trips / 50)
 
-        coords = list(zip(lats, lons))
+        # couleur simple (retard)
+        color = "green"
+        if row.Average_delay > 7:
+            color = "orange"
+        if row.Average_delay > 9:
+            color = "red"
 
-        # ------------------
-        # 🎯 PARAMS SCALABLE
-        # ------------------
-
-        # 👉 futur: remplacer par trip.volume / price
-        weight = 2
-        color = "#ff4d6d"
-
-        # ------------------
-        # 🌫️ GLOW (fond)
-        # ------------------
+        # ligne
         folium.PolyLine(
-            locations=coords,
-            color=color,
-            weight=6,
-            opacity=0.1
-        ).add_to(m)
-
-        # ------------------
-        # 🔥 LIGNE PRINCIPALE
-        # ------------------
-        folium.PolyLine(
-            locations=coords,
-            color=color,
+            locations=[(lat1, lon1), (lat2, lon2)],
             weight=weight,
-            opacity=0.8,
-            tooltip=f"{trip.departure_city.name} ↔ {trip.arrival_city.name}"
+            color=color,
+            opacity=0.7,
+            tooltip=f"{depart} → {arrive} | trips: {row.Number_of_trips}"
         ).add_to(m)
         
-        # ------------------
-        # ⚡ ANIMATION
-        # ------------------
-        if selected_city == True:
-            AntPath(
-                locations=coords,
-                color=color,
-                weight=2,
-                delay=900,
-                opacity=0.6
-            ).add_to(m)
-
     html_map = m.get_root().render()
 
     html_map = html_map.replace(

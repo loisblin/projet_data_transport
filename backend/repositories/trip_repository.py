@@ -2,7 +2,7 @@
 from operator import or_, and_
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy import func,extract
-
+from sqlalchemy.orm import aliased
 from backend.database import SessionLocal
 from backend.models import City
 from backend.models import Trip
@@ -11,14 +11,117 @@ from backend.models import Trip
 class TripRepository:
 
     def __init__(self,session = None):
-        if session == None:
+        if session is None:
             session = SessionLocal()
         self.session = session  
+    
+    def _get_base_map(self):
+        departure_city = aliased(City)
+        arrival_city = aliased(City)
+
+        query = (
+            self.session.query(
+                departure_city.name.label("departure_city"),
+                arrival_city.name.label("arrival_city"),
+                func.count(Trip.id).label("Number_of_trips"),
+                func.avg(Trip.price).label("Average_price"),
+                func.avg(Trip.delay).label("Average_delay"),
+            )
+            .join(departure_city, Trip.departure_city_id == departure_city.id)
+            .join(arrival_city, Trip.arrival_city_id == arrival_city.id)
+            .group_by(departure_city.id, arrival_city.id)
+        )
+
+        return query
+    def _get_base_table(self):
+        departure_city = aliased(City)
+        query = (self.session.query(
+            departure_city.name.label("Departure_city"),
+            func.count(Trip.id).label("Number_of_departure"),
+            func.avg(Trip.price).label("Average_price"),
+            func.avg(Trip.delay).label("Average_delay")
+
+        )
+        .join(departure_city,Trip.departure_city_id == departure_city.id)
+        .group_by(departure_city.id)
+        )
+        return query
+    def _filtre_time(self,query,time_granularity,day,hour):
+        if time_granularity == "week":
+            pass
+        elif time_granularity == "day":
+            query = query.filter(func.date(Trip.departure_time) == day)
+        elif time_granularity =="hour":
+            query = (
+            query
+            .filter(func.date(Trip.departure_time) == day)
+            .filter(extract('hour', Trip.departure_time) == hour)
+            )
+        else:
+            raise ValueError("wrong time granularity")
+        return query
+
+
+    def get_trips_map_data(self,time_granularity,day,hour):
+        query = self._get_base_map()
+        query = self._filtre_time(query,time_granularity,day,hour )
+        return query.all()
+    
+    def get_table_data(self,time_granularity,day,hour):
+        query = self._get_base_table()
+        query = self._filtre_time(query,time_granularity,day,hour )
+        return query.all()
+    
+    def get_histo_data(self, granularity, day):
+
+        departure_city = aliased(City)
+
+        query = (
+            self.session.query(
+                departure_city.name.label("departure_city"),
+                func.avg(Trip.price).label("average_price"),
+                func.avg(Trip.delay).label("average_delay"),
+            )
+            .join(departure_city, Trip.departure_city_id == departure_city.id)
+        )
+
+        if granularity == "week":
+            query = query.add_columns(
+                func.date(Trip.departure_time).label("period")
+            ).group_by(departure_city.name, func.date(Trip.departure_time))
+
+        elif granularity == "day" or granularity == "hour":
+            query = (
+                query
+                .filter(func.date(Trip.departure_time) == day)
+                .add_columns(
+                    extract('hour', Trip.departure_time).label("period")
+                )
+                .group_by(departure_city.name, extract('hour', Trip.departure_time))
+            )
+
+        return query.all()
+
+
+
+            
     def get_city_by_name(self, name):
         try:
             return self.session.query(City).filter_by(name=name).one()
         except (NoResultFound, MultipleResultsFound):
             return None
+    def get_hourly_trips_map(self,day,hour):
+        _, _, query = self._base_map_query()
+        query = (
+            query
+            .filter(func.date(Trip.departure_time) == day)
+            .filter(extract('hour', Trip.departure_time) == hour)
+        )
+
+        return query.all()
+    
+    
+    
     def get_trips(self,city=None,day=None,hour=None):
         query = self.session.query(Trip)
         if city:
