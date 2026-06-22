@@ -4,7 +4,7 @@ import numpy as np
 import folium
 import numpy as np
 from folium.plugins import AntPath
-def create_france_map( trips,cities_dict):
+def create_france_map( trips,cities_dict,metric):
     
     # 🌍 Carte
     m = folium.Map(
@@ -54,15 +54,22 @@ def create_france_map( trips,cities_dict):
         lat2, lon2 = cities_dict[arrive]
 
         # épaisseur selon nb trips
-        weight = max(1, row.Number_of_trips / 50)
-
-        # couleur simple (retard)
-        color = "green"
-        if row.Average_delay > 7:
-            color = "orange"
-        if row.Average_delay > 9:
-            color = "red"
-
+        weight = max(1, row.Number_of_trips / 10)
+        if metric == "delay":
+            # couleur simple (retard)
+            color = "green"
+            if row.Average_delay > 7:
+                color = "orange"
+            if row.Average_delay > 9:
+                color = "red"
+        elif metric =="price" :
+            color = "green"
+            if row.Average_price > 70:
+                color = "orange"
+            if row.Average_price > 110:
+                color = "red"
+        else :
+            raise KeyError
         # ligne
         folium.PolyLine(
             locations=[(lat1, lon1), (lat2, lon2)],

@@ -2,7 +2,7 @@ from dash import dash_table
 import pandas as pd
 from dash import html
 
-def create_table_city(df):
+def create_table_city(df,selected_city=None):
 
     # HEADER
     header = html.Div(
@@ -25,8 +25,13 @@ def create_table_city(df):
     # ROWS
     rows = []
     for i in range(len(df)):
+        city = str(df.iloc[i]["Departure_city"])
+
+        bg_color = "#2a6df4" if city == selected_city else "#111111"
+
         row = html.Div(
-            id={"type": "row", "city": str(df.iloc[i]["Departure_city"])},  # 🔥 important pour les callbacks
+            id={"type": "row", "city": city},
+            n_clicks=0,
             children=[
                 html.Div(str(df.iloc[i][col]), style={"flex": 1, "color": "white"})
                 for col in df.columns
@@ -35,7 +40,7 @@ def create_table_city(df):
                 "display": "flex",
                 "padding": "10px",
                 "borderBottom": "1px solid #222",
-                "backgroundColor": "#111111",
+                "backgroundColor": bg_color,  # 🔥 ICI le highlight
                 "cursor": "pointer"
             }
         )

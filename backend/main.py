@@ -14,6 +14,7 @@ def main():
     args = parser.parse_args()
     
     try:
+        
         # DEFAULT BEHAVIOR
         if not any([args.create, args.reset, args.seed]):
             logging.info("No args provided -> resetting DB + seeding 1000")
@@ -48,3 +49,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
